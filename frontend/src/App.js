@@ -6,14 +6,19 @@ import "./App.css";
 import axios from "axios";
 import { format } from "timeago.js";
 import "mapbox-gl/dist/mapbox-gl.css";
+import Register from "./components/Register";
+import Login from "./components/Login";
 
 function App() {
-  const currentUser = "worried";
+  const myStorage = window.localStorage;
+  const [currentUser, setCurrentUser] = useState(myStorage.getItem("user"));
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
   const [title, setTitle] = useState(null);
   const [desc, setDesc] = useState(null);
   const [rating, setRating] = useState(0);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [pins, setPins] = useState([]);
   const [viewState, setViewState] = useState({
     latitude: 48.137154,
@@ -70,6 +75,11 @@ function App() {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const handleLogout = () => {
+    myStorage.removeItem("user");
+    setCurrentUser(null);
   };
 
   return (
@@ -164,11 +174,36 @@ function App() {
             </Popup>
           </>
         )}
-        <button className="button logout">Log Out</button>
-        <div className="buttons">
-          <button className="button login">Log In</button>
-          <button className="button register">Register</button>
-        </div>
+        {currentUser ? (
+          <button className="button logout" onClick={handleLogout}>
+            Log Out
+          </button>
+        ) : (
+          <div className="buttons">
+            <button
+              className="button login"
+              onClick={() => {
+                setShowLogin(true);
+              }}>
+              Log In
+            </button>
+            <button
+              className="button register"
+              onClick={() => {
+                setShowRegister(true);
+              }}>
+              Register
+            </button>
+          </div>
+        )}
+        {showRegister && <Register setShowRegister={setShowRegister} />}
+        {showLogin && (
+          <Login
+            setShowLogin={setShowLogin}
+            myStorage={myStorage}
+            setCurrentUser={setCurrentUser}
+          />
+        )}
       </Map>
     </div>
   );
